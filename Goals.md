@@ -13,3 +13,13 @@
   - We will need to allow users to be members of multiple classes, as it is common for someone to be both a student and a teaching-assistant.
   - It may be best to have this run on a per-class basis.
 - [] Classes
+- [] Database Stuff
+  - We need to decide on a database first. I'm very ignorant about databases, but I hear about SQL a lot, so perhaps using MariaDB 10.x would be best?
+  - I've also heard a lot about using Redis(?) in conjunction with a SQL database, so we should investigate this.
+  - We could also use a NoSQL database, which seems to be very popular right now.
+  - BoltDB is very nice, and is pure Go. However, I worry that it may have poor performance.
+- [] Views/Frontend
+  - One of our goals is to minimize client-side rendering, as this is slow and very bad.
+  - I have heard good things about Elm recently, so maybe this should be investigated more.
+  - Go's html/template works, but it is basically pure HTML and thus can be very annoying.
+  - [Ace](https://github.com/yosssi/ace) is basically Go's version of Jade and seems okay, so perhaps we could use this

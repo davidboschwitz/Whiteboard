@@ -1,11 +1,12 @@
-EXECUTABLE = build/main
+EXECUTABLE = main
+VIEWS = src/views
 
 all: src/main.go
-	mkdir -p build
+	cp -r $(VIEWS) .
 	go build -o $(EXECUTABLE) src/main.go
 
 run:
 	./$(EXECUTABLE)
 
 clean:
-	rm -rf build
+	rm -rf $(EXECUTABLE) views/

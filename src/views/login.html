@@ -1,0 +1,33 @@
+<html>
+    <head>
+            <title>Login | Whiteboard</title>
+
+            <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+            <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/css/materialize.min.css" rel="stylesheet">
+    </head>
+
+    <body class="blue-grey darken-4 teal-text text-accent-2">
+            <div class="container">
+                    <div class="row top-spacing">
+                            <h1>Login</h1>
+                            <form action="/login" method="POST">
+                                    <div class="input-field col s12">
+                                            <input id="username" type="text" name="user">
+                                            <label for="user">Username</label>
+                                    </div>
+                                    <div class="input-field col s12">
+                                            <input id="password" type="password" name="password">
+                                            <label for="password">Password</label>
+                                    </div>
+                                    <div class="input-field col s12">
+                                            <button class="btn waves-effect waves-light" type="submit" name="action">Login</button>
+                                    </div>
+                            </form>
+                    </div>
+            </div>
+
+            <script src="https://code.jquery.com/jquery-2.1.2.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/js/materialize.min.js"></script>
+    </body>
+</html>
