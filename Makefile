@@ -1,12 +1,10 @@
 EXECUTABLE = main
-VIEWS = src/views
 
-all: src/main.go
-	cp -r $(VIEWS) .
+all: main.go
 	go build -o $(EXECUTABLE) src/main.go
 
 run:
 	./$(EXECUTABLE)
 
 clean:
-	rm -rf $(EXECUTABLE) views/
+	rm -rf $(EXECUTABLE)
