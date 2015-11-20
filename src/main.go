@@ -1,14 +1,12 @@
 package main
 
 import (
+	"./auth"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/securecookie"
-	"golang.org/x/crypto/bcrypt"
 	"html/template"
-	"io/ioutil"
 	"log"
 	"net/http"
-	"strings"
 )
 
 const (
@@ -35,6 +33,9 @@ func main() {
 	}
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Routes
+////////////////////////////////////////////////////////////////////////////////
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles("./views/home.html")
 	if err != nil {
@@ -45,7 +46,7 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
-	if loggedIn(w, r) {
+	if auth.LoggedIn(w, r, s) {
 		http.Redirect(w, r, "/auth-check", 302)
 		return
 	}
@@ -60,7 +61,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		user := r.FormValue("user")
 		pass := r.FormValue("password")
-		if validateLogin(user, pass) {
+		if auth.ValidateLogin(user, pass) {
 			value := map[string]string{
 				"authenticated": "true",
 			}
@@ -84,7 +85,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func AuthCheck(w http.ResponseWriter, r *http.Request) {
-	if !loggedIn(w, r) {
+	if !auth.LoggedIn(w, r, s) {
 		http.Redirect(w, r, "/login", 302)
 		return
 	}
@@ -95,36 +96,4 @@ func AuthCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	t.Execute(w, nil)
-}
-
-func validateLogin(user, password string) bool {
-	store, err := ioutil.ReadFile("user.pass")
-	if err != nil {
-		log.Println(err)
-		return false
-	}
-
-	userData := strings.Split(string(store), ":")
-
-	if user != userData[0] {
-		return false
-	}
-
-	err = bcrypt.CompareHashAndPassword([]byte(userData[1]), []byte(password))
-	if err != nil {
-		return false
-	}
-
-	return true
-}
-
-func loggedIn(w http.ResponseWriter, r *http.Request) bool {
-	if cookie, err := r.Cookie("whiteboard"); err == nil {
-		value := make(map[string]string)
-		if err = s.Decode("whiteboard", cookie.Value, &value); err == nil {
-			return true
-		}
-		return false
-	}
-	return false
 }
