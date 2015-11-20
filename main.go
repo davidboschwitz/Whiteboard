@@ -1,9 +1,9 @@
 package main
 
 import (
-	"./auth"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/securecookie"
+	"github.com/hunterpraska/Whiteboard/auth"
 	"html/template"
 	"log"
 	"net/http"

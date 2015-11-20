@@ -1,7 +1,7 @@
 EXECUTABLE = main
 
 all: main.go
-	go build -o $(EXECUTABLE) src/main.go
+	go build -o $(EXECUTABLE) main.go
 
 run:
 	./$(EXECUTABLE)
