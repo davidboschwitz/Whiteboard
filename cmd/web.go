@@ -15,7 +15,10 @@ var CmdWeb = cli.Command{
 	run, and it takes care of everything else for you`,
 	Action: runWeb,
 	Flags: []cli.Flag{
-		stringFlag("port, p", "8080", "Temporary port number to prevent conflict"),
+		cli.StringFlag{
+			Name:  "port, p",
+			Value: "8080",
+			Usage: "Temporary port number to prevent conflict"},
 	},
 }
 
@@ -28,9 +31,9 @@ func runWeb(ctx *cli.Context) {
 	webRouter := mux.NewRouter()
 
 	// Application routes
-	webRouter.HandleFunc("/", router.HomeHandler).Methods("GET")
-	webRouter.HandleFunc("/login", router.LoginHandler).Methods("GET", "POST")
-	webRouter.HandleFunc("/auth-check", router.AuthCheck).Methods("GET")
+	webRouter.HandleFunc("/", routers.HomeHandler).Methods("GET")
+	webRouter.HandleFunc("/login", routers.LoginHandler).Methods("GET", "POST")
+	webRouter.HandleFunc("/auth-check", routers.AuthCheck).Methods("GET")
 
 	http.Handle("/r/", http.StripPrefix("/r/", staticFiles))
 	http.Handle("/", webRouter)

@@ -5,6 +5,7 @@ import (
 	"github.com/hunterpraska/Whiteboard/auth"
 	"html/template"
 	"log"
+	"net/http"
 )
 
 // Secure Cookie variables

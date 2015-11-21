@@ -16,5 +16,5 @@ func main() {
 	app.Commands = []cli.Command{
 		cmd.CmdWeb,
 	}
-	app.Run(os.args)
+	app.Run(os.Args)
 }

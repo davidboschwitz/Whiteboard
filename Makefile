@@ -1,10 +1,10 @@
-EXECUTABLE = main
+EXECUTABLE = Whiteboard
 
 all: main.go
-	go build -o $(EXECUTABLE) main.go
+	go build
 
 run:
-	./$(EXECUTABLE)
+	./$(EXECUTABLE) web
 
 clean:
 	rm -rf $(EXECUTABLE)
