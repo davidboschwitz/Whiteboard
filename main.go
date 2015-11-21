@@ -19,6 +19,9 @@ var blockKey = securecookie.GenerateRandomKey(32)
 var s = securecookie.New(hashKey, blockKey)
 
 func main() {
+	// File server for static files: CSS, JS, etc.
+	staticFiles := http.FileServer(http.Dir("resources"))
+
 	router := mux.NewRouter()
 
 	// Application routes
@@ -26,6 +29,7 @@ func main() {
 	router.HandleFunc("/login", LoginHandler).Methods("GET", "POST")
 	router.HandleFunc("/auth-check", AuthCheck).Methods("GET")
 
+	http.Handle("/r/", http.StripPrefix("/r/", staticFiles))
 	http.Handle("/", router)
 
 	// Serve pages over HTTP on PORT
