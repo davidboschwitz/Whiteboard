@@ -3,7 +3,7 @@ package cmd
 import (
 	"github.com/codegangsta/cli"
 	"github.com/gorilla/mux"
-	"github.com/hunterpraska/router"
+	"github.com/hunterpraska/Whiteboard/routers"
 	"log"
 	"net/http"
 )
