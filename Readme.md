@@ -3,5 +3,11 @@ Whiteboard is a free open-source platform for education. Whiteboard is an easy, 
 
 # Build
 ```
+go get
 make
+```
+
+# Run
+```
+make run
 ```
