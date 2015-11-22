@@ -40,6 +40,7 @@ func runWeb(ctx *cli.Context) {
 	// Application routes
 	webRouter.HandleFunc("/", router.HomeHandler).Methods("GET")
 	webRouter.HandleFunc("/login", router.LoginHandler).Methods("GET", "POST")
+	webRouter.HandleFunc("/logout", router.LogoutHandler).Methods("GET")
 	webRouter.HandleFunc("/register", router.RegistrationHandler).Methods("GET", "POST")
 	webRouter.HandleFunc("/auth-check", router.AuthCheck).Methods("GET")
 

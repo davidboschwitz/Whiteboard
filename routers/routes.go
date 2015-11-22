@@ -73,6 +73,19 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Handles user logout and redirects to '/login'
+func LogoutHandler(w http.ResponseWriter, r *http.Request) {
+	if !auth.LoggedIn(w, r, s) {
+		http.Redirect(w, r, "/login", 302)
+		return
+	}
+
+	cookie := deleteCookie()
+	http.SetCookie(w, cookie)
+	http.Redirect(w, r, "/login", 302)
+	return
+}
+
 // Allow users to register
 func RegistrationHandler(w http.ResponseWriter, r *http.Request) {
 	if auth.LoggedIn(w, r, s) {
@@ -153,8 +166,18 @@ func createCookie() (*http.Cookie, error) {
 			Value: encoded,
 			Path:  "/",
 		}
+		cookie.MaxAge = 10000
 		return cookie, err
 	}
 
 	return nil, err
+}
+
+func deleteCookie() *http.Cookie {
+	// Create secure cookie with info removed
+	cookie := &http.Cookie{
+		Name: "whiteboard",
+	}
+	cookie.MaxAge = -1
+	return cookie
 }
