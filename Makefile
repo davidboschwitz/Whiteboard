@@ -1,7 +1,7 @@
-EXECUTABLE = Whiteboard
+EXECUTABLE = whiteboard
 
-all: main.go
-	go build
+all: whiteboard.go
+	go build whiteboard.go
 
 run:
 	./$(EXECUTABLE) web
