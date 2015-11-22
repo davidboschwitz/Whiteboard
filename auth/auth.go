@@ -5,10 +5,7 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/gorilla/securecookie"
 	"golang.org/x/crypto/bcrypt"
-	"io/ioutil"
-	"log"
 	"net/http"
-	"strings"
 )
 
 func ValidateLogin(user, password string, db *bolt.DB) bool {
@@ -18,11 +15,11 @@ func ValidateLogin(user, password string, db *bolt.DB) bool {
 			return fmt.Errorf("Bucket pastes not found!")
 		}
 
-		if passwordCrypt = bucket.Get([]byte(user)); err == nil {
+		if passwordCrypt = bucket.Get([]byte(user)); passwordCrypt == nil {
 			return fmt.Errorf("User not found!")
 		}
 
-		err = bcrypt.CompareHashAndPassword(passwordCrypt, []byte(password))
+		err := bcrypt.CompareHashAndPassword(passwordCrypt, []byte(password))
 		return err
 	})
 	if err != nil {
