@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"fmt"
+	"github.com/boltdb/bolt"
 	"github.com/gorilla/securecookie"
 	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
@@ -9,24 +11,23 @@ import (
 	"strings"
 )
 
-func ValidateLogin(user, password string) bool {
-	store, err := ioutil.ReadFile("user.pass")
+func ValidateLogin(user, password string, db *bolt.DB) bool {
+	err := db.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte("users"))
+		if bucket == nil {
+			return fmt.Errorf("Bucket pastes not found!")
+		}
+
+		if passwordCrypt = bucket.Get([]byte(user)); err == nil {
+			return fmt.Errorf("User not found!")
+		}
+
+		err = bcrypt.CompareHashAndPassword(passwordCrypt, []byte(password))
+		return err
+	})
 	if err != nil {
-		log.Println(err)
 		return false
 	}
-
-	userData := strings.Split(string(store), ":")
-
-	if user != userData[0] {
-		return false
-	}
-
-	err = bcrypt.CompareHashAndPassword([]byte(userData[1]), []byte(password))
-	if err != nil {
-		return false
-	}
-
 	return true
 }
 

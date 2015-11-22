@@ -25,6 +25,13 @@ var CmdWeb = cli.Command{
 const PORT = ":8080"
 
 func runWeb(ctx *cli.Context) {
+	// Open database
+	err := routers.OpenDB()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
 	// File server for static files: CSS, JS, etc.
 	staticFiles := http.FileServer(http.Dir("resources"))
 
@@ -39,9 +46,11 @@ func runWeb(ctx *cli.Context) {
 	http.Handle("/", webRouter)
 
 	// Serve pages over HTTP on PORT
-	err := http.ListenAndServe(PORT, nil)
+	err = http.ListenAndServe(PORT, nil)
 	if err != nil {
 		log.Println(err)
+		routers.CloseDB()
 		return
 	}
+	routers.CloseDB()
 }

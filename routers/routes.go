@@ -1,6 +1,7 @@
 package router
 
 import (
+	"github.com/boltdb/bolt"
 	"github.com/gorilla/securecookie"
 	"github.com/hunterpraska/Whiteboard/auth"
 	"html/template"
@@ -12,6 +13,18 @@ import (
 var hashKey = securecookie.GenerateRandomKey(32)
 var blockKey = securecookie.GenerateRandomKey(32)
 var s = securecookie.New(hashKey, blockKey)
+
+// Database connection
+var db bolt.DB
+
+func OpenDB() error {
+	db, err := bolt.Open("whiteboard.db", 0600, nil)
+	return err
+}
+
+func CloseDB() {
+	db.Close()
+}
 
 // Handles home page requests
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
@@ -43,26 +56,65 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		pass := r.FormValue("password")
 
 		// Attempt to validate user, if incorrect info, send user back to login page
-		if auth.ValidateLogin(user, pass) {
-			// Create secure cookie with login info
-			value := map[string]string{
-				"authenticated": "true",
-			}
-			if encoded, err := s.Encode("whiteboard", value); err == nil {
-				cookie := &http.Cookie{
-					Name:  "whiteboard",
-					Value: encoded,
-					Path:  "/",
-				}
-				http.SetCookie(w, cookie)
-			} else {
+		if auth.ValidateLogin(user, pass, db) {
+			cookie, err := createCookie()
+			if err != nil {
 				log.Println(err)
 				http.Redirect(w, r, "/login", 302)
 				return
 			}
+			http.SetCookie(w, cookie)
 			http.Redirect(w, r, "/auth-check", 302)
 		} else {
 			http.Redirect(w, r, "/login", 302)
+		}
+	}
+}
+
+// Allow users to register
+func RegistrationHandler(w http.ResponseWriter, r *http.Request) {
+	if auth.LoggedIn(w, r, s) {
+		http.Redirect(w, r, "/auth-check", 302)
+		return
+	}
+
+	if r.Method == "GET" {
+		t, err := template.ParseFiles("views/registration.html")
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		t.Execute(w, nil)
+	} else {
+		// Get values from html form
+		user := r.FormValue("user")
+		pass := r.FormValue("password")
+
+		err := db.Update(func(tx *bolt.Tx) error {
+			bucket, err := tx.CreateBucketIfNotExists([]byte("users"))
+			if err != nil {
+				return err
+			}
+
+			err = bucket.Put([]byte(user), []byte(password))
+			if err != nil {
+				return err
+			}
+
+			cookie, err := createCookie()
+			if err != nil {
+				log.Println(err)
+				http.Redirect(w, r, "/login", 302)
+				return
+			}
+			http.SetCookie(w, cookie)
+
+			http.Redirect(w, r, "auth-check", 302)
+			return nil
+		})
+		if err != nil {
+			log.Println(err)
+			return
 		}
 	}
 }
@@ -80,4 +132,21 @@ func AuthCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	t.Execute(w, nil)
+}
+
+func createCookie() (*http.Cookie, error) {
+	// Create secure cookie with login info
+	value := map[string]string{
+		"authenticated": "true",
+	}
+	if encoded, err := s.Encode("whiteboard", value); err == nil {
+		cookie := &http.Cookie{
+			Name:  "whiteboard",
+			Value: encoded,
+			Path:  "/",
+		}
+		return cookie, err
+	}
+
+	return nil, err
 }
