@@ -2,6 +2,8 @@
 Whiteboard is a free open-source platform for education. Whiteboard is an easy, modern way for staff and students to manage grades and schoolwork.
 
 # Build
+In order to build whiteboard, you need a properly configured Go 1.4 or newer, and make.
+
 ```
 go get
 make
