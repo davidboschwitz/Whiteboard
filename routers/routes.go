@@ -4,6 +4,7 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/gorilla/securecookie"
 	"github.com/hunterpraska/Whiteboard/auth"
+	"golang.org/x/crypto/bcrypt"
 	"html/template"
 	"log"
 	"net/http"
@@ -15,10 +16,11 @@ var blockKey = securecookie.GenerateRandomKey(32)
 var s = securecookie.New(hashKey, blockKey)
 
 // Database connection
-var db bolt.DB
+var db *bolt.DB
 
 func OpenDB() error {
-	db, err := bolt.Open("whiteboard.db", 0600, nil)
+	var err error
+	db, err = bolt.Open("whiteboard.db", 0600, nil)
 	return err
 }
 
@@ -88,7 +90,7 @@ func RegistrationHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		// Get values from html form
 		user := r.FormValue("user")
-		pass := r.FormValue("password")
+		password := r.FormValue("password")
 
 		err := db.Update(func(tx *bolt.Tx) error {
 			bucket, err := tx.CreateBucketIfNotExists([]byte("users"))
@@ -96,16 +98,19 @@ func RegistrationHandler(w http.ResponseWriter, r *http.Request) {
 				return err
 			}
 
-			err = bucket.Put([]byte(user), []byte(password))
+			passwordCrypt, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+			if err != nil {
+				return err
+			}
+
+			err = bucket.Put([]byte(user), passwordCrypt)
 			if err != nil {
 				return err
 			}
 
 			cookie, err := createCookie()
 			if err != nil {
-				log.Println(err)
-				http.Redirect(w, r, "/login", 302)
-				return
+				return err
 			}
 			http.SetCookie(w, cookie)
 
@@ -117,6 +122,7 @@ func RegistrationHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	http.Redirect(w, r, "/register", 302)
 }
 
 // Test of user authentication. Redirects user to login page if not logged in.
@@ -135,6 +141,8 @@ func AuthCheck(w http.ResponseWriter, r *http.Request) {
 }
 
 func createCookie() (*http.Cookie, error) {
+	var err error
+
 	// Create secure cookie with login info
 	value := map[string]string{
 		"authenticated": "true",

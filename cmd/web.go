@@ -26,7 +26,7 @@ const PORT = ":8080"
 
 func runWeb(ctx *cli.Context) {
 	// Open database
-	err := routers.OpenDB()
+	err := router.OpenDB()
 	if err != nil {
 		log.Println(err)
 		return
@@ -38,9 +38,10 @@ func runWeb(ctx *cli.Context) {
 	webRouter := mux.NewRouter()
 
 	// Application routes
-	webRouter.HandleFunc("/", routers.HomeHandler).Methods("GET")
-	webRouter.HandleFunc("/login", routers.LoginHandler).Methods("GET", "POST")
-	webRouter.HandleFunc("/auth-check", routers.AuthCheck).Methods("GET")
+	webRouter.HandleFunc("/", router.HomeHandler).Methods("GET")
+	webRouter.HandleFunc("/login", router.LoginHandler).Methods("GET", "POST")
+	webRouter.HandleFunc("/register", router.RegistrationHandler).Methods("GET", "POST")
+	webRouter.HandleFunc("/auth-check", router.AuthCheck).Methods("GET")
 
 	http.Handle("/r/", http.StripPrefix("/r/", staticFiles))
 	http.Handle("/", webRouter)
@@ -49,8 +50,8 @@ func runWeb(ctx *cli.Context) {
 	err = http.ListenAndServe(PORT, nil)
 	if err != nil {
 		log.Println(err)
-		routers.CloseDB()
+		router.CloseDB()
 		return
 	}
-	routers.CloseDB()
+	router.CloseDB()
 }

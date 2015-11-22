@@ -15,6 +15,7 @@ func ValidateLogin(user, password string, db *bolt.DB) bool {
 			return fmt.Errorf("Bucket pastes not found!")
 		}
 
+		var passwordCrypt []byte
 		if passwordCrypt = bucket.Get([]byte(user)); passwordCrypt == nil {
 			return fmt.Errorf("User not found!")
 		}
